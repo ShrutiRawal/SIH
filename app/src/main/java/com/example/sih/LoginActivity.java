@@ -2,6 +2,9 @@ package com.example.sih;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -11,20 +14,29 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
     private Button btnLogin,btnChngelang,login,register,btnRegister;
     private ImageView logo;
+    public View customview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,21 +116,79 @@ public class LoginActivity extends AppCompatActivity {
     private void showLoginPopup() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(LoginActivity.this);
         LayoutInflater inflater = getLayoutInflater();
-        View customview = inflater.inflate(R.layout.popup_user_login,null);
+         customview = inflater.inflate(R.layout.popup_user_login,null);
+
         mBuilder.setView(customview);
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
-        final EditText phone = customview.findViewById(R.id.phone);
-        final EditText password = customview.findViewById(R.id.password);
+        TextInputEditText phonenum = customview.findViewById(R.id.phone);
+        String phone = phonenum.getText().toString();
+        TextInputEditText pass = customview.findViewById(R.id.password);
+        String password = pass.getText().toString();
         TextView forgotPwd = customview.findViewById(R.id.forgotPwd);
         login = customview.findViewById(R.id.login);
+        login.setFocusable(true);
+        login.setClickable(true);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
-                startActivity(intent);
+                if(validateLogin(phone,password)){
+                    loginApiCall(phone,password);
+                }
             }
         });
+    }
+
+
+    private void loginApiCall(String phone, String password) {
+        LoginDetails details = new LoginDetails(phone,password);
+        Call<AuthResponse> call = AppClient.getInstance().createService(APIServices.class).postLoginUser(details);
+        call.enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                try {
+                    if (getApplicationContext() != null) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                AuthResponse authResponse = response.body();
+                                 /*pref.setSharedPref(LoginActivity.this, authResponse.getToken(), authResponse.getFirstName(),
+                                       authResponse.getLastName(), loginEmail.getText().toString());
+                                pref.setIsLoggedIn(LoginActivity.this, true);
+                                 Log.e("LoginActivity Login", response.body().getMessage());*/
+                                Toast.makeText(LoginActivity.this, "Welcome To Sehyatri!",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else
+                                Toast.makeText(LoginActivity.this, "Couldn't log you in. Please try again.",Toast.LENGTH_SHORT).show();
+                        } else if(response.code() == 401){
+                            Toast.makeText(LoginActivity.this, "Invalid Credentials!",Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(LoginActivity.this, "Couldn't log you in. Please try again later.",Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "An Error occurred while logging you in. Please try again in a while!",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean validateLogin(String phone, String password) {
+        if(phone.length()==0 || phone.trim().length()==0){
+            Toast.makeText(LoginActivity.this,"Phone must be atleast 10 characters long",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if(password.length()<8 || password.trim().length()<8){
+            Toast.makeText(LoginActivity.this,"Password must be atleast 8 characters long",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        Toast.makeText(LoginActivity.this,"Validated!",Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     private  void showRegistrationPopup(){
@@ -128,17 +198,71 @@ public class LoginActivity extends AppCompatActivity {
         mBuilder.setView(customview);
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
-        final EditText name = customview.findViewById(R.id.name);
-        final EditText phone = customview.findViewById(R.id.phone);
-        final EditText password = customview.findViewById(R.id.password);
+        final EditText user = customview.findViewById(R.id.name);
+        final EditText phonenum = customview.findViewById(R.id.phone);
+        final EditText pass = customview.findViewById(R.id.password);
+        String name = user.getText().toString();
+        String phone = phonenum.getText().toString();
+        String password = pass.getText().toString();
         register = customview.findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
-                startActivity(intent);
+                if(validateRegister(name,phone,password)){
+                    //api call
+                    registerApiCall(name,phone,password);
+                }
             }
         });
+    }
+
+    private void registerApiCall(String name, String phone, String password) {
+        RegisterDetails details = new RegisterDetails(name,phone,password);
+        Call<AuthResponse> call = AppClient.getInstance().createService(APIServices.class).postRegisterUser(details);
+        call.enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                try {
+                    if (getApplicationContext() != null) {
+                        if (response.isSuccessful()) {
+                            if (response.body() != null) {
+                                AuthResponse authResponse = response.body();
+                                Toast.makeText(LoginActivity.this, "Successfully registered!",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Sorry! Couldn't Register You. Please try again.",Toast.LENGTH_SHORT).show();
+                                Log.e("LoginActivity Register", "Response Successful, Response Body NULL");
+                            }
+                        } else if (response.code() == 400) {
+                            Toast.makeText(getApplicationContext(), "User with this email already exists.",Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(LoginActivity.this, "Sorry! Couldn't Register You. Please try again in some time.",Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Registration failed!."+t.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean validateRegister(String name, String phone, String password) {
+        if(phone.length()==0 || phone.trim().length()==0){
+            return false;
+        }
+        if(name.length()==0 || name.trim().length()==0){
+            return false;
+        }
+        if(password.length()<8 || password.trim().length()<8){
+            Toast.makeText(LoginActivity.this,"Password must be atleast 8 characters long",Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     private void initialiseWidgets() {
