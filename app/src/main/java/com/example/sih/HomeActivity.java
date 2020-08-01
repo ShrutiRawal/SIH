@@ -2,6 +2,8 @@ package com.example.sih;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class HomeActivity extends AppCompatActivity {
 
     public int ActivityNum = 0;
-    private Button sendSms;
+     Button sendSms,loadFuel,findPetrolPump;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initialiseWidgets() {
         sendSms = findViewById(R.id.sendSms);
+        loadFuel = findViewById(R.id.loadFuel);
+        findPetrolPump = findViewById(R.id.findPetrolPump);
+        findPetrolPump.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=petrol pumps");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+            }
+        });
         /*sendSms.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

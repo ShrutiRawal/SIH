@@ -35,7 +35,6 @@ import java.util.Objects;
 public class LoginActivity extends AppCompatActivity {
 
     private Button btnLogin,btnChngelang,login,register,btnRegister;
-    private ImageView logo;
     public View customview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,7 +256,6 @@ public class LoginActivity extends AppCompatActivity {
     private void initialiseWidgets() {
         btnLogin = findViewById(R.id.login_button);
         btnChngelang = findViewById(R.id.changeLanguage);
-        logo = findViewById(R.id.mainLogo);
         btnRegister = (Button)findViewById(R.id.register_button);
 
     }
