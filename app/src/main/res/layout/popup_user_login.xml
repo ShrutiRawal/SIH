@@ -82,6 +82,7 @@
             android:textSize="18sp"
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
+            android:onClick="loginNow"
             android:textStyle="bold"
             android:textAlignment="center"
             />

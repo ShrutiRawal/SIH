@@ -116,25 +116,17 @@ public class LoginActivity extends AppCompatActivity {
     private void showLoginPopup() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(LoginActivity.this);
         LayoutInflater inflater = getLayoutInflater();
-         customview = inflater.inflate(R.layout.popup_user_login,null);
-
+        customview = inflater.inflate(R.layout.popup_user_login,null);
         mBuilder.setView(customview);
         AlertDialog mDialog = mBuilder.create();
-        mDialog.show();
-        TextInputEditText phonenum = customview.findViewById(R.id.phone);
-        String phone = phonenum.getText().toString();
-        TextInputEditText pass = customview.findViewById(R.id.password);
-        String password = pass.getText().toString();
-        TextView forgotPwd = customview.findViewById(R.id.forgotPwd);
         login = customview.findViewById(R.id.login);
-        login.setFocusable(true);
-        login.setClickable(true);
+        mDialog.show();
+        final EditText phonenum = customview.findViewById(R.id.phone);
+        final EditText pass = customview.findViewById(R.id.password);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validateLogin(phone,password)){
-                    loginApiCall(phone,password);
-                }
+                loginApiCall(phonenum.getText().toString(),pass.getText().toString());
             }
         });
     }
@@ -201,16 +193,13 @@ public class LoginActivity extends AppCompatActivity {
         final EditText user = customview.findViewById(R.id.name);
         final EditText phonenum = customview.findViewById(R.id.phone);
         final EditText pass = customview.findViewById(R.id.password);
-        String name = user.getText().toString();
-        String phone = phonenum.getText().toString();
-        String password = pass.getText().toString();
         register = customview.findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validateRegister(name,phone,password)){
+                if(validateRegister(user.getText().toString(),phonenum.getText().toString(),pass.getText().toString())){
                     //api call
-                    registerApiCall(name,phone,password);
+                    registerApiCall(user.getText().toString(),phonenum.getText().toString(),pass.getText().toString());
                 }
             }
         });
