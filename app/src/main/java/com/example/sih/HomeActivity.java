@@ -15,7 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class HomeActivity extends AppCompatActivity {
 
     public int ActivityNum = 0;
-     Button sendSms,loadFuel,findPetrolPump;
+     Button loadFuel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,18 +26,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initialiseWidgets() {
-        sendSms = findViewById(R.id.sendSms);
         loadFuel = findViewById(R.id.loadFuel);
-        findPetrolPump = findViewById(R.id.findPetrolPump);
-        findPetrolPump.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri gmmIntentUri = Uri.parse("geo:0,0?q=petrol pumps");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
-            }
-        });
         /*sendSms.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
