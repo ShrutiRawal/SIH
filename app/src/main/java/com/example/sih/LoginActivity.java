@@ -45,9 +45,9 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //showLoginPopup();
-                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
-                startActivity(intent);
+                showLoginPopup();
+               /* Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+                startActivity(intent);*/
             }
         });
         btnChngelang.setOnClickListener(new View.OnClickListener() {
